@@ -1,0 +1,326 @@
+
+测试要求
+1)测试 10 20 50 100 200 1k 5k 字节 value 大小，redis get set 性能。
+2)写入一定量的 kv 数据, 根据数据大小 1w-50w 自己评估, 结合写入前后的 info memory 信息  , 
+分析上述不同 value 大小下，平均每个 key 的占用内存空间
+
+redis version: v3.0.504
+操作系统：win10 
+
+未写入数据前memory info 
+# Memory
+used_memory:692240
+used_memory_human:676.02K
+used_memory_rss:655304
+used_memory_peak:693080
+used_memory_peak_human:676.84K
+used_memory_lua:36864
+mem_fragmentation_ratio:0.95
+mem_allocator:jemalloc-3.6.0
+
+
+
+命令一：10并发 10字节
+redis-benchmark  -c 10  -d 10 -t get,set  
+====== SET ======
+  100000 requests completed in 4.23 seconds
+  10 parallel clients
+  10 bytes payload
+  keep alive: 1
+
+98.42% <= 1 milliseconds
+99.78% <= 2 milliseconds
+99.92% <= 3 milliseconds
+99.95% <= 4 milliseconds
+99.97% <= 5 milliseconds
+99.99% <= 6 milliseconds
+99.99% <= 37 milliseconds
+100.00% <= 38 milliseconds
+100.00% <= 38 milliseconds
+23657.44 requests per second
+
+====== GET ======
+  100000 requests completed in 3.76 seconds
+  10 parallel clients
+  10 bytes payload
+  keep alive: 1
+
+99.46% <= 1 milliseconds
+100.00% <= 2 milliseconds
+100.00% <= 2 milliseconds
+26602.82 requests per second
+
+
+命令二：10并发 20字节
+redis-benchmark  -c 10  -d 20 -t get,set 
+====== SET ======
+  100000 requests completed in 3.79 seconds
+  10 parallel clients
+  20 bytes payload
+  keep alive: 1
+
+99.51% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+26364.36 requests per second
+
+====== GET ======
+  100000 requests completed in 3.82 seconds
+  10 parallel clients
+  20 bytes payload
+  keep alive: 1
+
+99.53% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+26157.47 requests per second
+
+
+命令三：10并发 50字节
+redis-benchmark  -c 10  -d 50 -t get,set 
+====== SET ======
+  100000 requests completed in 4.43 seconds
+  10 parallel clients
+  50 bytes payload
+  keep alive: 1
+
+97.81% <= 1 milliseconds
+99.59% <= 2 milliseconds
+99.89% <= 3 milliseconds
+99.96% <= 4 milliseconds
+99.98% <= 5 milliseconds
+99.98% <= 6 milliseconds
+99.98% <= 7 milliseconds
+99.99% <= 13 milliseconds
+99.99% <= 14 milliseconds
+100.00% <= 14 milliseconds
+22553.00 requests per second
+
+====== GET ======
+  100000 requests completed in 4.08 seconds
+  10 parallel clients
+  50 bytes payload
+  keep alive: 1
+
+99.25% <= 1 milliseconds
+99.96% <= 2 milliseconds
+100.00% <= 2 milliseconds
+24503.80 requests per second
+
+命令四：10并发 100字节
+redis-benchmark  -c 10  -d 100 -t get,set 
+====== SET ======
+  100000 requests completed in 4.09 seconds
+  10 parallel clients
+  100 bytes payload
+  keep alive: 1
+
+98.42% <= 1 milliseconds
+99.77% <= 2 milliseconds
+99.90% <= 3 milliseconds
+99.96% <= 4 milliseconds
+99.96% <= 5 milliseconds
+99.97% <= 6 milliseconds
+99.98% <= 10 milliseconds
+99.99% <= 12 milliseconds
+100.00% <= 13 milliseconds
+100.00% <= 13 milliseconds
+24461.84 requests per second
+
+====== GET ======
+  100000 requests completed in 3.87 seconds
+  10 parallel clients
+  100 bytes payload
+  keep alive: 1
+
+99.58% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+25859.84 requests per second
+
+
+命令五：10并发 200字节
+redis-benchmark  -c 10  -d 200 -t get,set 
+====== SET ======
+  100000 requests completed in 3.82 seconds
+  10 parallel clients
+  200 bytes payload
+  keep alive: 1
+
+99.38% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+26212.32 requests per second
+
+====== GET ======
+  100000 requests completed in 3.87 seconds
+  10 parallel clients
+  200 bytes payload
+  keep alive: 1
+
+99.63% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+25866.53 requests per second
+
+命令六：10并发 1024字节
+redis-benchmark  -c 10  -d 1024 -t get,set 
+====== SET ======
+  100000 requests completed in 4.57 seconds
+  10 parallel clients
+  1024 bytes payload
+  keep alive: 1
+
+97.47% <= 1 milliseconds
+99.52% <= 2 milliseconds
+99.80% <= 3 milliseconds
+99.89% <= 4 milliseconds
+99.92% <= 5 milliseconds
+99.93% <= 6 milliseconds
+99.94% <= 7 milliseconds
+99.94% <= 8 milliseconds
+99.94% <= 9 milliseconds
+99.95% <= 10 milliseconds
+99.96% <= 11 milliseconds
+99.97% <= 12 milliseconds
+99.97% <= 13 milliseconds
+99.97% <= 18 milliseconds
+99.97% <= 19 milliseconds
+99.98% <= 20 milliseconds
+99.98% <= 21 milliseconds
+99.99% <= 22 milliseconds
+99.99% <= 23 milliseconds
+99.99% <= 33 milliseconds
+100.00% <= 33 milliseconds
+21877.05 requests per second
+
+====== GET ======
+  100000 requests completed in 4.11 seconds
+  10 parallel clients
+  1024 bytes payload
+  keep alive: 1
+
+99.24% <= 1 milliseconds
+99.95% <= 2 milliseconds
+99.97% <= 3 milliseconds
+99.97% <= 4 milliseconds
+99.98% <= 5 milliseconds
+99.98% <= 6 milliseconds
+99.99% <= 7 milliseconds
+99.99% <= 12 milliseconds
+100.00% <= 13 milliseconds
+100.00% <= 13 milliseconds
+24301.34 requests per second
+
+
+命令六：10并发 5120字节
+redis-benchmark  -c 10  -d 5120 -t get,set 
+
+====== SET ======
+  100000 requests completed in 6.06 seconds
+  10 parallel clients
+  5120 bytes payload
+  keep alive: 1
+
+97.96% <= 1 milliseconds
+99.54% <= 2 milliseconds
+99.78% <= 3 milliseconds
+99.86% <= 4 milliseconds
+99.90% <= 5 milliseconds
+99.92% <= 6 milliseconds
+99.93% <= 7 milliseconds
+99.96% <= 8 milliseconds
+99.97% <= 9 milliseconds
+99.97% <= 10 milliseconds
+99.98% <= 11 milliseconds
+99.98% <= 12 milliseconds
+99.98% <= 13 milliseconds
+99.98% <= 14 milliseconds
+99.98% <= 15 milliseconds
+99.99% <= 17 milliseconds
+99.99% <= 34 milliseconds
+99.99% <= 37 milliseconds
+99.99% <= 38 milliseconds
+99.99% <= 39 milliseconds
+100.00% <= 107 milliseconds
+100.00% <= 108 milliseconds
+100.00% <= 108 milliseconds
+16493.48 requests per second
+
+====== GET ======
+  100000 requests completed in 5.59 seconds
+  10 parallel clients
+  5120 bytes payload
+  keep alive: 1
+
+98.92% <= 1 milliseconds
+99.98% <= 2 milliseconds
+99.99% <= 8 milliseconds
+100.00% <= 8 milliseconds
+17898.69 requests per second
+
+
+
+
+命令七： 并发10 随机key 5万 value 5k 
+redis-benchmark  -c 10  -d 5120 -r 50000  -t set
+
+====== SET ======
+  100000 requests completed in 7.18 seconds
+  10 parallel clients
+  5120 bytes payload
+  keep alive: 1
+
+93.54% <= 1 milliseconds
+98.87% <= 2 milliseconds
+99.65% <= 3 milliseconds
+99.83% <= 4 milliseconds
+99.89% <= 5 milliseconds
+99.92% <= 6 milliseconds
+99.93% <= 7 milliseconds
+99.95% <= 8 milliseconds
+99.96% <= 13 milliseconds
+99.96% <= 14 milliseconds
+99.97% <= 19 milliseconds
+99.97% <= 20 milliseconds
+99.98% <= 63 milliseconds
+99.98% <= 65 milliseconds
+99.99% <= 66 milliseconds
+99.99% <= 67 milliseconds
+99.99% <= 147 milliseconds
+99.99% <= 148 milliseconds
+100.00% <= 148 milliseconds
+13917.88 requests per second
+
+内存对比：
+127.0.0.1:6379> info memory   # 插入数据前
+# Memory  
+used_memory:699520
+used_memory_human:683.13K
+used_memory_rss:662584
+used_memory_peak:1276864
+used_memory_peak_human:1.22M
+used_memory_lua:36864
+mem_fragmentation_ratio:0.95
+mem_allocator:jemalloc-3.6.0
+127.0.0.1:6379> info memory
+# Memory                      #插入数据后， 直插入43000多个数据 ，预计5万 244.14M，实际342M
+used_memory:358656896
+used_memory_human:342.04M
+used_memory_rss:358619968
+used_memory_peak:358656896
+used_memory_peak_human:342.04M
+used_memory_lua:36864
+mem_fragmentation_ratio:1.00
+mem_allocator:jemalloc-3.6.0
+
+
+分析key占用的大小
+redis-memory-for-key -s localhost -p 6379 -d 0  key:000000037735
+Key                             key:000000037735
+Bytes                           6208
+Type                            string
+
+
+
+
