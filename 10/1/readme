@@ -1,0 +1,20 @@
+socket 粘包的解包方式: 
+1、LineBasedFrameDecoder:基于行来进行消息粘包拆包处理的。   
+适用场景：每个上层数据包，使用换行符或者回车换行符做为边界分割符。
+发送端发送的时候，每个数据包之间以换行符/回车换行符作为分隔。
+在这种场景下，只需要把这个解码器加到 pipeline 中，使用换行分隔符，
+把底层帧分割成一个一个完整的应用层数据包，发送到下一站
+2、FixedLengthFrameDecoder :基于固定长度消息进行粘包拆包处理的。
+适用场景：每个上层数据包的长度，都是固定的，比如 100。
+在这种场景下，只需要把这个解码器加到 pipeline 中，Netty 会把底层帧，
+拆分成一个个长度为 100 的数据包 (ByteBuf)，发送到下一个 channelHandler入站处理器。
+3、DelimiterBaseFrameDecoder：基于分隔符做结束标志进行粘包拆包处理的，对于使用"\n","\r\n"做分隔符内部会调用
+DelimiterBasedFrameDecoder 是LineBasedFrameDecoder的通用版本。
+不同之处在于，这个解码器，可以自定义分隔符，而不是局限于换行符。
+如果使用这个解码器，在发送的时候，末尾必须带上对应的分隔符
+4、LengthFieldBasedFrameDecoder基于消息头指定消息长度进行粘包拆包处理的。
+这是一种基于灵活长度的解码器。在数据包中，加了一个长度字段（长度域），保存上层包的长度。
+解码的时候，会按照这个长度，进行上层ByteBuf应用包的提取
+
+
+参考文献： https://www.cnblogs.com/crazymakercircle/p/10294745.html
